@@ -1,42 +1,53 @@
 import io.restassured.RestAssured;
-import io.restassured.http.Headers;
-import io.restassured.http.Method;
+import io.restassured.parsing.Parser;
+import io.restassured.path.xml.XmlPath;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import org.json.simple.JSONObject;
-import org.junit.Assert;
+
+import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 
 public class LoginPostService {
 
     @Test
-    public void getPageService(){
+    public void FailedLoginTest(){
 
-        //Specify base URI
-        RestAssured.baseURI = "http://thedemosite.co.uk";
-        RequestSpecification request = RestAssured.given();
+        RestAssured.baseURI="http://thedemosite.co.uk";
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        Response list=RestAssured.given()
+                .urlEncodingEnabled(true)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .when()
+                .param("username","testuser")
+                .param("password","test1")
+                .post("/login.php");
 
-        JSONObject jsonObject = new JSONObject();
+        list.then()
+                .statusCode(200);
 
-        jsonObject.put("username","testuser");
-        jsonObject.put("password","testpassword");
+        Assert.assertTrue(list.asString().contains("**Failed Login**"),"Failed login başlığı bulunamadı!");
 
-        request.header("Content-Type","application/x-www-form-urlencoded");
-        request.body(jsonObject.toJSONString());
-        Response response = request.request(Method.POST,"/login.php");
+    }
 
-        Headers headers = response.headers();
-        System.out.println(headers+"\n");
+    @Test
+    public void SuccessLoginTest(){
 
-        int statusCode=response.getStatusCode();
-        System.out.println("Status code: "+statusCode+"\n");
-        Assert.assertEquals(statusCode,200);
+        RestAssured.baseURI="http://thedemosite.co.uk";
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        Response list=RestAssured.given()
+                .urlEncodingEnabled(true)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .when()
+                .param("username","testuser")
+                .param("password","testpass")
+                .post("/login.php");
 
-        String responseBody = response.getBody().asString();
-        System.out.println(responseBody);
-        Assert.assertTrue(responseBody.contains("<html>"));
+        list.then()
+                .statusCode(200);
 
-
+        Assert.assertTrue(list.asString().contains("**Successful Login**"),"Successful login başlığı bulunamadı!");
 
     }
 }
