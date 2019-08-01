@@ -26,7 +26,8 @@ public class LoginPostService {
 
         list.then()
                 .statusCode(200);
-
+        System.out.println(list.headers());
+        System.out.println(list.asString());
         Assert.assertTrue(list.asString().contains("**Failed Login**"),"Failed login başlığı bulunamadı!");
 
     }
@@ -46,7 +47,8 @@ public class LoginPostService {
 
         list.then()
                 .statusCode(200);
-
+        System.out.println(list.headers());
+        System.out.println(list.asString());
         Assert.assertTrue(list.asString().contains("**Successful Login**"),"Successful login başlığı bulunamadı!");
 
     }
